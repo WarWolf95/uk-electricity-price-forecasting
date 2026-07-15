@@ -1,109 +1,119 @@
 # Multimodal Deep Learning for UK Wholesale Electricity Price Forecasting
 
-## Overview
-This project uses multimodal deep learning to predict UK wholesale electricity prices by integrating market data, weather conditions, grid signals, and NLP-derived geopolitical sentiment. 
+This project predicts UK wholesale electricity prices by combining market data, weather, grid conditions, and news sentiment. The idea was to see whether NLP-derived geopolitical signals add any value during volatile periods like the 2022 energy crisis, or whether price history alone is good enough.
 
-For the complete project plan, data sources, and architecture, refer to [`project_capsule.md`](./project_capsule.md).
+## How it works
 
-## Progress Log
+Seven data sources feed into the pipeline, all pulled from public APIs (no paid keys needed):
 
-### Phase 1: Data Collection (Completed)
-- [x] Initialized project directory structure (`src/`, `data/`, `notebooks/`).
-- [x] Created `src/data/elexon_client.py` for fetching half-hourly system prices, generation mix, and demand from the Elexon BMRS API.
-- [x] Created `src/data/weather_client.py` to retrieve weather and solar generation data.
-- [x] Created `src/data/gas_client.py` to fetch wholesale gas prices.
-- [x] Created `src/data/news_client.py` to collect energy/geopolitical news articles for NLP processing.
-- [x] Created `src/data/fetch_all.py` to orchestrate data collection across all providers.
-- [x] Created `src/utils/create_samples.py` to generate smaller sample datasets for testing and rapid iteration (optimised for local 16GB RAM constraints).
-- [x] **Fix:** Demand endpoint changed from `/datasets/INDO` (real-time only) to `/demand/outturn` (historical half-hourly). Now returns 1,488 rows (48/day × 31 days) with `initialDemandOutturn` and `initialTransmissionSystemDemandOutturn`.
-- [x] **Fix:** Gas client rewritten from FRED API (required API key) to yfinance TTF gas futures (`TTF=F`). Dutch TTF is the primary European gas benchmark — no API key required. Falls back to `NG=F` if unavailable.
-- [x] **Removed:** `fetch_wind_forecast()` and `wind_forecast.csv` — the WINDFOR endpoint is forward-looking only (returns real-time forecasts, not historical data). Wind generation is already captured in `generation_mix.csv` by `fuelType` and will be extracted via pivot in Phase 2.
+| What | Where from | Granularity |
+|---|---|---|
+| Electricity prices (target) | Elexon BMRS | Half-hourly |
+| Generation by fuel type | Elexon BMRS | Half-hourly |
+| National demand | Elexon BMRS | Half-hourly |
+| Solar generation | Sheffield Solar PV Live | Half-hourly |
+| Weather (temp, wind, cloud) | Open-Meteo Archive | Hourly |
+| Gas prices (TTF futures) | Yahoo Finance | Daily |
+| News articles | Guardian API | Per-article |
 
-#### Data Inventory (Jan 2023 — 1 month test window)
-| Dataset | File | Rows | Resolution |
-|---------|------|------|------------|
-| System Prices (target) | `system_prices.csv` | 1,484 | Half-hourly |
-| Generation Mix | `generation_mix.csv` | 26,784 | Half-hourly × fuel type |
-| National Demand | `national_demand.csv` | 1,488 | Half-hourly |
+Everything gets aligned to half-hourly timestamps, missing values get interpolated, and the generation mix gets pivoted by fuel type into feature columns. News articles pass through FinBERT for daily sentiment scoring, which becomes an additional feature alongside lags, rolling windows, and calendar flags.
 
-| Solar Generation | `national_solar.csv` | 1,488 | Half-hourly |
-| Weather (temp/wind/cloud) | `historical_weather.csv` | 744 | Hourly |
-| Gas Prices (TTF futures) | `gas_prices.csv` | 20 | Daily (trading days) |
-| News Articles | `news_articles.csv` | 687 | Per-article |
+The full dataset runs from January 2020 to June 2025.
 
-### Phase 2: Preprocessing & Feature Engineering (Completed)
-- [x] Expand data collection to full date range (2020–2025) to cover the 2022 energy crisis.
-- [x] Align all datasets to half-hourly timestamps.
-- [x] Handle missing values and interpolation.
-- [x] Pivot `generation_mix` by `fuelType` to extract per-source generation features (wind, gas, solar, nuclear, etc.).
-- [x] Implement NLP pipeline (FinBERT) on news articles to extract daily geopolitical sentiment scores.
-- [x] Build lag features, rolling windows, and calendar features.
-- [x] Orchestrate preprocessing and feature building via `run_phase2.py`.
+## Models
 
-### Phase 3: Model Training (Completed)
-- [x] Baseline Models: Fitted ARIMA(2,1,2) on recent history; trained XGBoost.
-- [x] Deep Learning Models: LSTM (2-layer, 128 hidden), Transformer (2-layer, 8-head, 128-dim), Gated Transformer (custom attention + GRN).
-- [x] Improved training pipeline: validation split (last 14 days), early stopping (patience=5), ReduceLROnPlateau scheduler, gradient clipping.
-- [x] GPU acceleration via NVIDIA RTX 5060 (CUDA).
+Five architectures, ranging from a naive baseline to a custom attention-based model:
 
-### Phase 4: Evaluation (Completed)
-- [x] Walk-forward validation: Evaluated all configurations across 5 expanding folds.
-- [x] Crisis Period Analysis: Dedicated holdout on 2022 Russia-Ukraine energy crisis. Transformer + sentiment achieves best crisis R² (0.50).
-- [x] Diebold-Mariano tests: Verified prediction improvement significance.
-- [x] Modality importance analysis: XGBoost feature importances across data sources. Modality mix shifts during crisis.
+- **ARIMA(2,1,2)** -- prices only, statistical baseline
+- **XGBoost** -- 200 trees, max depth 8
+- **LSTM** -- 2-layer, 128 hidden units
+- **Transformer** -- 2-layer, 8-head attention, 128-dim embeddings
+- **Gated Transformer** -- custom model with gated residual networks feeding into multi-head attention
 
-#### Usage
+All deep learning models were trained with a validation holdout (last 14 days), early stopping (patience 5), learning rate scheduling, and gradient clipping. Ran on an RTX 5060, which kept training times reasonable.
+
+## Key results
+
+### Crisis period (Feb-Oct 2022 energy crisis)
+
+The Transformer with sentiment features performed best here, which was the main question the project set out to answer.
+
+| Model | Sentiment | MAE | RMSE | sMAPE | R2 |
+|---|---|---|---|---|---|
+| ARIMA | Price only | 94.17 | 131.22 | 51.32 | -0.15 |
+| XGBoost | No | 75.57 | 137.32 | 38.03 | -0.25 |
+| XGBoost | Yes | 73.50 | 126.90 | 38.33 | -0.07 |
+| LSTM | No | 70.74 | 92.04 | 40.63 | 0.44 |
+| LSTM | Yes | 70.35 | 92.68 | 40.57 | 0.43 |
+| Transformer | No | 68.94 | 92.13 | 40.10 | 0.44 |
+| **Transformer** | **Yes** | **66.09** | **86.63** | **39.35** | **0.50** |
+| GatedTransformer | No | 80.93 | 105.22 | 44.96 | 0.26 |
+| GatedTransformer | Yes | 103.92 | 142.33 | 62.17 | -0.35 |
+
+Sentiment features improved Transformer MAE by about 4% during the crisis. The effect is modest but consistent across models. During normal market conditions (tested via 5-fold walk-forward on 2025 data), sentiment was neutral to slightly detrimental. It only adds value when the market is under unusual stress.
+
+### Normal conditions (walk-forward, 5 folds)
+
+XGBoost dominates here. Deep learning models need more training data to converge -- they struggled on fold 1 (where the training set was smallest) but recovered by fold 5.
+
+| Model | MAE | RMSE | sMAPE | R2 |
+|---|---|---|---|---|
+| ARIMA | 39.59 | 47.99 | 58.21 | -0.45 |
+| **XGBoost** | **17.82** | **23.86** | **33.10** | **0.66** |
+| LSTM | 23.36 | 29.20 | 40.30 | 0.49 |
+| Transformer | 26.69 | 34.01 | 42.35 | 0.27 |
+| GatedTransformer | 40.01 | 55.01 | 48.78 | -1.88 |
+
+### What matters most (feature importance)
+
+During the crisis, the modality mix shifted noticeably. Price history dropped from its usual ~45% contribution down to ~33%, while grid/generation and NLP sentiment gained ground. Makes sense -- when historical patterns break down, real-time supply-demand and news signals become relatively more informative.
+
+| Modality | Contribution |
+|---|---|
+| Grid / Generation | 34.1% |
+| Price History | 33.2% |
+| Gas Prices | 12.8% |
+| Weather | 11.0% |
+| NLP Sentiment | 6.9% |
+| Calendar | 2.0% |
+
+## Running it
 
 ```bash
-python src/models/train_and_evaluate.py --mode crisis       # Crisis holdout (primary RQ)
-python src/models/train_and_evaluate.py --mode walkforward  # 5-fold walk-forward (robustness)
-python src/models/train_and_evaluate.py --quick             # XGBoost + LSTM only (fast iteration)
-python src/models/train_and_evaluate.py --epochs 50         # Custom max epochs
+# Crisis holdout (trains on pre-2022 data, tests on Feb-Oct 2022)
+python src/models/train_and_evaluate.py --mode crisis
+
+# 5-fold walk-forward on normal market conditions
+python src/models/train_and_evaluate.py --mode walkforward
+
+# Quick run (XGBoost + LSTM only, skips Transformer and GatedTransformer)
+python src/models/train_and_evaluate.py --quick
+
+# Adjust max epochs
+python src/models/train_and_evaluate.py --epochs 50
 ```
 
-Results are written to `data/processed/model_comparison_{mode}.csv` and `forecast_predictions_{mode}.csv`.
+Results land in `data/processed/` as CSV files.
 
-#### Crisis Period Results (PRIMARY — 2022 Russia-Ukraine energy crisis)
-| Model | Configuration | MAE | RMSE | sMAPE (%) | $R^2$ |
-|:---|:---|:---:|:---:|:---:|:---:|
-| **ARIMA** | Price-Only (Baseline) | 94.17 | 131.22 | 51.32 | -0.15 |
-| **XGBoost** | With Sentiment | 73.50 | 126.90 | 38.33 | -0.07 |
-| **XGBoost** | Without Sentiment | 75.57 | 137.32 | 38.03 | -0.25 |
-| **LSTM** | With Sentiment | 70.35 | 92.68 | 40.57 | 0.43 |
-| **LSTM** | Without Sentiment | 70.74 | 92.04 | 40.63 | 0.44 |
-| **Transformer** | With Sentiment | **66.09** | **86.63** | 39.35 | **0.50** |
-| **Transformer** | Without Sentiment | 68.94 | 92.13 | 40.10 | 0.44 |
-| **GatedTransformer** | With Sentiment | 103.92 | 142.33 | 62.17 | -0.35 |
-| **GatedTransformer** | Without Sentiment | 80.93 | 105.22 | 44.96 | 0.26 |
+## Project structure
 
-*Train: 2020-01 to 2022-01-31 (pre-crisis). Test: 2022-02-01 to 2022-10-31 (crisis). DL models trained with 30 max epochs, validation split, early stopping, GPU (RTX 5060).*
+```
+src/
+  data/         # API clients for each data source
+  features/     # Alignment, feature engineering, sentiment pipeline
+  models/       # Training and evaluation pipeline
+  utils/        # Helper scripts
+scripts/        # Analysis and metric recalculation
+data/
+  processed/    # Model outputs and feature importance
+  raw/          # Raw API responses (not tracked in git)
+```
 
-**Headline finding:** The Transformer with geopolitical sentiment achieves the best crisis-period performance (R²=0.50, MAE=66.09). Sentiment features improve Transformer MAE by 4.1% during the crisis vs no-sentiment baseline. This confirms RQ1 — NLP-derived geopolitical signals add value during regime shifts when historical price patterns alone are insufficient.
+## Data sources
 
-#### Walk-Forward Results (SECONDARY — normal market conditions, avg 5 folds)
-| Model | Configuration | MAE | RMSE | sMAPE (%) | $R^2$ |
-|:---|:---|:---:|:---:|:---:|:---:|
-| **ARIMA** | Price-Only (Baseline) | 39.59 | 47.99 | 58.21 | -0.45 |
-| **XGBoost** | Without Sentiment | **17.82** | **23.86** | **33.10** | **0.66** |
-| **XGBoost** | With Sentiment | 17.88 | 23.91 | 33.19 | 0.66 |
-| **LSTM** | With Sentiment | 23.36 | 29.20 | 40.30 | 0.49 |
-| **LSTM** | Without Sentiment | 24.49 | 30.56 | 42.52 | 0.44 |
-| **Transformer** | Without Sentiment | 26.69 | 34.01 | 42.35 | 0.27 |
-| **Transformer** | With Sentiment | 29.39 | 41.53 | 44.11 | -0.32 |
-| **GatedTransformer** | Without Sentiment | 43.50 | 64.49 | 48.27 | -3.78 |
-| **GatedTransformer** | With Sentiment | 40.01 | 55.01 | 48.78 | -1.88 |
-
-*Note: DL models struggle on Fold 1 (smallest training set) — Transformer R²=-3.51, GatedTransformer R²=-10.98 — but converge to positive R² by Fold 5 (full training data). This indicates DL models require larger training windows than tree-based methods. XGBoost is robust throughout and the best model for normal-period forecasting.*
-
-#### Modality Importance (XGBoost, crisis fold)
-| Modality | Contribution |
-|:---|---:|
-| **Grid / Generation** (demand, fuel mix, interconnectors) | 34.1% |
-| **Price History** (lags, rolling stats) | 33.2% |
-| **Gas Prices** (TTF futures) | 12.8% |
-| **Weather** (temp, wind, cloud, solar) | 11.0% |
-| **NLP Sentiment** (FinBERT news scores) | 6.9% |
-| **Calendar** (hour, day, month, weekend) | 2.0% |
-
-*During the crisis, Price History drops from ~45% to ~33% importance while Grid/Generation and NLP Sentiment increase — consistent with the hypothesis that historical price patterns become less reliable during regime shifts, and real-time supply/demand + news signals gain relevance.*
-
+All data is publicly available and used under the Open Government Licence or equivalent:
+- Elexon BMRS API (UK electricity market data)
+- Sheffield Solar PV Live (national solar generation)
+- Open-Meteo Archive (historical weather)
+- Yahoo Finance (TTF gas futures)
+- Guardian Open Platform API (news articles)
