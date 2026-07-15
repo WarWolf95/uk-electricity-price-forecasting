@@ -1,0 +1,37 @@
+# Core DL
+torch
+torchvision
+torchaudio
+transformers
+accelerate
+bitsandbytes
+pytorch-forecasting
+pytorch-lightning
+
+# Data Collection
+requests
+beautifulsoup4
+yfinance
+pandas-datareader
+
+# Data Processing
+pandas
+duckdb
+spacy
+nltk
+
+# ML Models
+xgboost
+scikit-learn
+statsmodels
+
+# Visualization
+plotly
+matplotlib
+seaborn
+
+# APIs
+openai
+
+# Fine-tuning
+peft

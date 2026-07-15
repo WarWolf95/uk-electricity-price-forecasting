@@ -1,0 +1,46 @@
+Fold,Model,Config,MAE,RMSE,sMAPE,R2
+1,ARIMA,Price-Only,39.25,48.28,45.64,-0.237
+1,XGBoost,With Sentiment,26.3,45.64,29.9,-0.1056
+1,LSTM,With Sentiment,28.03,35.05,35.02,0.3481
+1,Transformer,With Sentiment,48.75,65.31,50.05,-1.2634
+1,GatedTransformer,With Sentiment,184.7,293.2,74.85,-44.6174
+1,XGBoost,Without Sentiment,24.68,39.39,29.72,0.1768
+1,LSTM,Without Sentiment,27.59,35.81,33.88,0.3197
+1,Transformer,Without Sentiment,36.23,47.49,39.24,-0.197
+1,GatedTransformer,Without Sentiment,105.19,153.26,72.63,-11.4649
+2,ARIMA,Price-Only,48.16,55.17,65.74,-1.7514
+2,XGBoost,With Sentiment,17.07,23.38,22.89,0.5057
+2,LSTM,With Sentiment,24.03,29.93,32.66,0.1901
+2,Transformer,With Sentiment,23.0,29.45,28.24,0.216
+2,GatedTransformer,With Sentiment,25.26,31.81,32.36,0.0855
+2,XGBoost,Without Sentiment,17.27,24.71,23.13,0.4478
+2,LSTM,Without Sentiment,23.01,28.81,31.46,0.2494
+2,Transformer,Without Sentiment,21.79,28.1,27.87,0.2863
+2,GatedTransformer,Without Sentiment,26.96,33.56,35.15,-0.018
+3,ARIMA,Price-Only,35.65,47.5,52.23,-0.1711
+3,XGBoost,With Sentiment,18.74,24.14,37.93,0.6974
+3,LSTM,With Sentiment,23.97,29.8,45.42,0.5389
+3,Transformer,With Sentiment,24.22,30.12,45.8,0.529
+3,GatedTransformer,With Sentiment,25.92,33.48,47.61,0.4182
+3,XGBoost,Without Sentiment,18.21,23.6,36.34,0.7108
+3,LSTM,Without Sentiment,24.21,30.01,45.81,0.5326
+3,Transformer,Without Sentiment,25.09,31.2,47.26,0.4946
+3,GatedTransformer,Without Sentiment,27.47,35.45,48.48,0.3474
+4,ARIMA,Price-Only,28.78,36.54,42.21,-0.0191
+4,XGBoost,With Sentiment,16.28,21.21,30.08,0.6568
+4,LSTM,With Sentiment,20.66,25.3,35.76,0.5116
+4,Transformer,With Sentiment,21.61,27.18,38.18,0.4362
+4,GatedTransformer,With Sentiment,23.73,29.33,42.0,0.3434
+4,XGBoost,Without Sentiment,16.32,21.06,30.39,0.6614
+4,LSTM,Without Sentiment,21.07,26.18,36.64,0.4772
+4,Transformer,Without Sentiment,21.11,25.54,37.19,0.5023
+4,GatedTransformer,Without Sentiment,23.79,29.22,39.13,0.3484
+5,ARIMA,Price-Only,46.1,52.45,85.25,-0.0903
+5,XGBoost,With Sentiment,20.13,26.68,50.43,0.7178
+5,LSTM,With Sentiment,25.66,32.26,59.97,0.5876
+5,Transformer,With Sentiment,27.81,35.15,61.38,0.5103
+5,GatedTransformer,With Sentiment,26.26,33.57,62.16,0.5533
+5,XGBoost,Without Sentiment,19.97,26.58,49.91,0.72
+5,LSTM,Without Sentiment,24.07,30.3,56.71,0.636
+5,Transformer,Without Sentiment,26.8,33.34,62.26,0.5595
+5,GatedTransformer,Without Sentiment,32.88,39.29,71.93,0.3882

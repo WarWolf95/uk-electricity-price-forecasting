@@ -1,0 +1,51 @@
+feature,importance,modality
+settlementPeriod,0.011394534,Grid / Generation
+BIOMASS,0.00843633,Grid / Generation
+CCGT,0.011952432,Grid / Generation
+COAL,0.020429345,Grid / Generation
+INTELE,0.0,Grid / Generation
+INTELEC,0.002401926,Grid / Generation
+INTEW,0.028160138,Grid / Generation
+INTFR,0.007697141,Grid / Generation
+INTGRNL,0.010178646,Grid / Generation
+INTIFA2,0.0121729225,Grid / Generation
+INTIRL,0.014246685,Grid / Generation
+INTNED,0.007480501,Grid / Generation
+INTNEM,0.004561543,Grid / Generation
+INTNSL,0.0070965416,Grid / Generation
+INTVKL,0.012877474,Grid / Generation
+NPSHYD,0.014447851,Grid / Generation
+NUCLEAR,0.014121946,Grid / Generation
+OCGT,0.06956277,Grid / Generation
+OIL,0.0,Grid / Generation
+OTHER,0.0073326975,Grid / Generation
+PS,0.008856345,Grid / Generation
+WIND,0.030001806,Grid / Generation
+initialDemandOutturn,0.005671006,Grid / Generation
+initialTransmissionSystemDemandOutturn,0.004227576,Grid / Generation
+solar_generation_mw,0.017368242,Weather
+temperature_2m,0.012584468,Weather
+wind_speed_10m,0.00800931,Weather
+cloud_cover,0.018127855,Weather
+gas_price_close,0.009606887,Gas Prices
+gas_price_high,0.012139767,Gas Prices
+gas_price_low,0.0062147398,Gas Prices
+sentiment_score,0.01928011,NLP Sentiment
+article_count,0.0055603096,NLP Sentiment
+systemSellPrice_lag_1,0.33541536,Price History
+systemBuyPrice_lag_1,0.0,Price History
+systemSellPrice_lag_2,0.018143637,Price History
+systemSellPrice_lag_48,0.01094571,Price History
+systemSellPrice_rolling_24h_mean,0.03648211,Price History
+systemSellPrice_rolling_24h_std,0.07932011,Price History
+systemSellPrice_rolling_7d_mean,0.026033599,Price History
+gas_price_close_lag_48,0.029030703,Gas Prices
+gas_price_close_lag_96,0.0057487604,Gas Prices
+gas_price_day_change,0.0035456724,Gas Prices
+total_interconnector_imports,0.0115212565,Grid / Generation
+daily_sentiment_lag_48,0.0046964195,NLP Sentiment
+article_count_lag_48,0.004559764,NLP Sentiment
+hour,0.002701015,Calendar
+day_of_week,0.0033519485,Calendar
+month,0.006303985,Calendar
+is_weekend,0.0,Calendar

@@ -1,0 +1,46 @@
+# Environment
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Internal tracking (not for public repo)
+project_capsule.md
+PROGRESS_LOG.md
+DEEP_REVIEW.md
+ANTIGRAVITY_TRAINING.md
+scratch/
+
+# Data
+data/raw/*.csv
+data/raw_samples/
+data/db/
+
+# Notebooks (placeholder only)
+notebooks/
+
+# Dissertation proposals and personal docs
+*.docx
+copy_extracted.txt
+
+# Random scratch scripts in root
+extract.py
+extract_copy.py
+trim_answers.py
+import requests.py
+inspect_docx.py
+inspect_tables.py
+create_crunched_docx.py
+check_run.ps1
+run_all_training.py
+
+# Training logs
+training_*.log
+training_*.status
+
+# Workspace
+*.code-workspace
+
+# OS
+Thumbs.db
+.DS_Store
