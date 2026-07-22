@@ -33,6 +33,8 @@ inspect_tables.py
 create_crunched_docx.py
 check_run.ps1
 run_all_training.py
+setup_student_prototype.py
+generate_progress_report.py
 
 # Training logs
 training_*.log
