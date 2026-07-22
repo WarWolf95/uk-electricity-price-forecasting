@@ -37,7 +37,9 @@ def test_feature_dataset_schema():
 def test_model_imports():
     """Ensure forecasting model architectures import cleanly."""
     try:
-        from src.models.train_and_evaluate import XGBoostRunner
+        from src.models.train_and_evaluate import XGBoostRunner, LSTMRunner, TransformerRunner
         assert XGBoostRunner is not None
-    except ModuleNotFoundError:
-        pytest.skip("PyTorch optional dependency not installed in local environment")
+        assert LSTMRunner is not None
+        assert TransformerRunner is not None
+    except ModuleNotFoundError as e:
+        pytest.skip(f"Dependency not installed in environment: {e}")
