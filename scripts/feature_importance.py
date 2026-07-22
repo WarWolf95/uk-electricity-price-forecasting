@@ -9,7 +9,9 @@ import numpy as np
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 
-PROJECT_DIR = r"C:\Dissertation"
+from pathlib import Path
+
+PROJECT_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = os.path.join(PROJECT_DIR, "data", "processed", "model_features.csv")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "data", "processed")
 os.makedirs(OUTPUT_DIR, exist_ok=True)

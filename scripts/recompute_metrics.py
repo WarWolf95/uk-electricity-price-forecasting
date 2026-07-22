@@ -7,7 +7,9 @@ import os
 import pandas as pd
 import numpy as np
 
-PROJECT_DIR = r"C:\Dissertation"
+from pathlib import Path
+
+PROJECT_DIR = Path(__file__).resolve().parent.parent
 PRED_PATH = os.path.join(PROJECT_DIR, "data", "processed", "forecast_predictions.csv")
 OUTPUT_PATH = os.path.join(PROJECT_DIR, "data", "processed", "model_comparison_smape.csv")
 

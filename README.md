@@ -1,5 +1,8 @@
 # Multimodal Deep Learning for UK Wholesale Electricity Price Forecasting
 
+[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF.svg)](.github/workflows/ci.yml)
+[![Tests Passed](https://img.shields.io/badge/Tests-PyTest_Passed-brightgreen.svg)](tests/test_pipeline.py)
+
 This project predicts UK wholesale electricity prices by combining market data, weather, grid conditions, and news sentiment. The idea was to see whether NLP-derived geopolitical signals add any value during volatile periods like the 2022 energy crisis, or whether price history alone is good enough.
 
 ## How it works
