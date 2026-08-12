@@ -1,12 +1,14 @@
 # Environment
 venv/
 __pycache__/
+.pytest_cache/
 *.pyc
 .env
 
-# Internal tracking (not for public repo)
+# Local working notes and internal tracking
 project_capsule.md
 PROGRESS_LOG.md
+DRAFT_PROGRESS.md
 DEEP_REVIEW.md
 ANTIGRAVITY_TRAINING.md
 scratch/
@@ -16,12 +18,12 @@ data/raw/*.csv
 data/raw_samples/
 data/db/
 
-# Notebooks (placeholder only)
-notebooks/
-
-# Dissertation proposals and personal docs
+# Personal and course documents
 *.docx
+*.pdf
 copy_extracted.txt
+temp_header.txt
+Dissertation Submission/
 
 # Random scratch scripts in root
 extract.py
