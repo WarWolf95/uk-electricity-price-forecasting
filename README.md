@@ -1,5 +1,11 @@
 # Multimodal Deep Learning for UK Wholesale Electricity Price Forecasting
 
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Framework PyTorch](https://img.shields.io/badge/Framework-PyTorch-EE4C2C.svg)](https://pytorch.org/)
+[![Model XGBoost](https://img.shields.io/badge/Model-XGBoost-189fdd.svg)](https://xgboost.readthedocs.io/)
+[![NLP FinBERT](https://img.shields.io/badge/NLP-FinBERT-FFD21E.svg)](https://huggingface.co/ProsusAI/finbert)
+
 Predict UK wholesale electricity prices by fusing market data, weather, grid conditions and news sentiment. The core research question is whether NLP-derived geopolitical signals add measurable value during volatile market regimes, using the 2022 energy crisis as a natural experiment.
 
 ## Highlights
@@ -200,3 +206,9 @@ Key literature underpinning the approach:
 - Caldara, D., & Iacoviello, M. (2022). Measuring Geopolitical Risk. *American Economic Review*.
 
 Full bibliographic details and DOIs are included in the analysis notebook (`notebooks/01_eda_and_results_analysis.ipynb`).
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
